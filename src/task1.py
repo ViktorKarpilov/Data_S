@@ -1,4 +1,5 @@
 import os
+import plotly
 path = os.path.join("../data/task1.csv")
 
 def make_list(file):
@@ -48,23 +49,91 @@ products = {
         }
     }
 '''
-def Add_product(product,dataset):
-    # TODO
+def Add_product(product,owner,data,dataset):
+    # TODO later
     pass
 
-def Make_products_set(dataset):
-    products_set = {}
-    dataset = set(dataset)
-    for person in dataset.values():
-        for date in dataset[person].values():
-            Add_person(dataset[person][date],products_set)
+# def Make_products_set(dataset):
+#     products_set = {}
+#     dataset = set(dataset)
+#     for person in dataset.values():
+#         for date in dataset[person].values():
+#             Add_person(dataset[person][date],products_set)
 
 
+def Make_list(dataset,i):
+    result = []
+    for date in list(dataset.values())[i].values():
+        result += date.keys()
+    return set(result)
 
 
 def Find_popular_meal(dataset):
-    # TODO
-    pass
+    result = Make_list(dataset,0)
+    for i in range(1,len(list(dataset.values()))):
+        result = result.intersection(Make_list(dataset,i))
+    if result:
+        return list(result)
+    return []
+
+
+def Make_graphic(dataset,search_product):
+    print(list(dataset.values())[0])
+    result = {}
+    for person in list(dataset.values()):
+        for date,products in person.items():
+            if date not in result:
+                if search_product in products:
+                    result[date] = products[search_product][1]
+
+    plotly.offline.plot([plotly.graph_objs.Bar(x=list(result.keys()),y=list(result.values()))])
+
+
+def Make_persons_statistic(dataset):
+    # list(dataset.keys())
+    # list(dataset.values())[0]
+    result = {}
+    for person,shops in dataset.items():
+        result[person] = Person_expensen(shops)
+    return result
+
+def Person_expensen(shops):
+    result = 0
+    for products in list(shops.values()):
+        for i in products.values():
+            result += float(i[0])*float(i[1])
+
+    return result
+
+def Build_graphic_expenses(dataset):
+    expenses = Make_persons_statistic(dataset)
+    data = plotly.graph_objs.Bar(x=list(expenses.keys()),y=list(expenses.values()))
+    plotly.offline.plot([data])
+
+'''
+    apple:{
+        price:4.5,
+        count:4
+        }
+'''
+def Make_products_list(dataset):
+    result = {}
+    for shops in dataset.values():
+        for products in list(shops.values()):
+            for product,value in products.items():
+                if product in result:
+                    result[product]["count"] += 1
+                else:
+                    result[product] = {
+                        "count":1,
+                        "price":value[0]
+                    }
+    return result
+
+def Find_min(data):
+    max = ["",0]
+    for key,value in data.items():
+        key
 
 
 if __name__ == '__main__':
@@ -73,6 +142,7 @@ if __name__ == '__main__':
         data = make_list(file)
         for person in data:
             Add_person(person,dataset)
+        Find_min(Make_products_list(dataset))
 
 
 
