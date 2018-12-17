@@ -61,7 +61,7 @@ def Add_product(product,owner,data,dataset):
 #             Add_person(dataset[person][date],products_set)
 
 
-def Make_list(dataset,i):
+def Make_dataset_list(dataset,i):
     result = []
     for date in list(dataset.values())[i].values():
         result += date.keys()
@@ -69,9 +69,9 @@ def Make_list(dataset,i):
 
 
 def Find_popular_meal(dataset):
-    result = Make_list(dataset,0)
+    result = Make_dataset_list(dataset,0)
     for i in range(1,len(list(dataset.values()))):
-        result = result.intersection(Make_list(dataset,i))
+        result = result.intersection(Make_dataset_list(dataset,i))
     if result:
         return list(result)
     return []
@@ -126,15 +126,45 @@ def Make_products_list(dataset):
                 else:
                     result[product] = {
                         "count":1,
-                        "price":value[0]
+                        "price":value[1]
                     }
     return result
 
-def Find_min(data):
-    max = ["",0]
+def find_max(data):
+    max = 0
+    product = ""
     for key,value in data.items():
-        key
+        if value["count"] > max:
+            max = value["count"]
+            product = key
+    return {product:max}
+def find_min(data):
 
+    min = list(data.values())[0]['count']
+    product = list(data.keys())[0]
+    for key,value in data.items():
+        if value["count"] < min:
+            min = value["count"]
+            product = key
+    return {product:min}
+def find_max_pice(data):
+    max = 0
+    product = ""
+    for key,value in data.items():
+
+        if float(value["price"]) > max:
+            max = float(value["price"])
+            product = key
+    return {product:max}
+def Build_buys_graph(data):
+    dta = {}
+    for i,j in data.items():
+        dta[i] = j['count']
+
+
+    print(dta)
+    figure = plotly.graph_objs.Bar(x=list(dta.keys()),y=list(dta.values()))
+    plotly.offline.plot([figure])
 
 if __name__ == '__main__':
     with open(path, "r") as file:
@@ -142,7 +172,8 @@ if __name__ == '__main__':
         data = make_list(file)
         for person in data:
             Add_person(person,dataset)
-        Find_min(Make_products_list(dataset))
+        print(Find_popular_meal(dataset))
+
 
 
 
